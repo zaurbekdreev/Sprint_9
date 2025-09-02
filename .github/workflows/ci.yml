@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Create and run selenoid container
+        run: docker compose up -d selenoid
+
+      - name: Create and run vnc container
+        run: docker compose up -d selenoid_vnc_chrome
+
+      - name: Create and run tests container
+        run: docker compose up tests
+
+      - name: Stop and remove containers
+        run: docker compose down

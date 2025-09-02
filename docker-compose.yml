@@ -1,0 +1,34 @@
+services:
+
+  selenoid:
+    image: aerokube/selenoid:latest-release
+    container_name: selenoid
+    ports:
+      - "4444:4444"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/:/etc/selenoid/:ro
+    command:
+      - "-container-network=selenoid"
+    networks:
+      - selenoid
+
+  tests:
+    build: .
+    container_name: sprint_9
+    depends_on:
+      - selenoid
+    volumes:
+      - ./:/work
+    working_dir: /work
+    command:
+      - pytest
+    networks:
+      - selenoid
+
+  selenoid_vnc_chrome:
+    image: selenoid/vnc:chrome_128.0
+
+networks:
+  selenoid:
+    name: selenoid
